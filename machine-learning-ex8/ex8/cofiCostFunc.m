@@ -40,23 +40,75 @@ Theta_grad = zeros(size(Theta));
 %                     partial derivatives w.r.t. to each element of Theta
 %
 
+pred = X * Theta';
 
+% -- cost function
 
+for i = 1 : num_movies
+  for j = 1 : num_users
+    if R(i,j) == 1
+      J += (pred(i,j) - Y(i,j)) ^ 2;
+    endif
+  endfor
+endfor
 
+J = J / 2;
 
+% -- gradients
 
+for k = 1 : num_features
+  for i = 1 : num_movies
+    for j = 1 : num_users
+      if R(i,j) == 1
+        X_grad(i,k)  += (pred(i,j) - Y(i,j)) * Theta(j,k);
+        Theta_grad(j,k) += (pred(i,j) - Y(i,j)) * X(i,k);
+      endif
+    endfor
+  endfor
+endfor
 
+% -- regularized cost function
 
+for k = 1 : num_features
+  for i = 1 : num_movies
+    J += (lambda / 2) * X(i,k) ^ 2;
+  endfor
+  for j = 1 : num_users
+    J += (lambda / 2) * Theta(j,k) ^ 2;
+  endfor
+endfor
 
+% -- regularized gradient
 
+X_grad += lambda .* X;
+Theta_grad += lambda .* Theta;
 
-
-
-
-
+##for i = 1 : num_movies
+##  X_grad(i) += lambda * X(i);
+##endfor
+##
+##for j = 1 : num_users
+##  Theta_grad(j) += lambda * Theta(j);
+##endfor
 
 % =============================================================
 
 grad = [X_grad(:); Theta_grad(:)];
 
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
